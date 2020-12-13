@@ -35,7 +35,7 @@ export default (state, action) => {
         prevMessages: action.item,
       };
     case NEW_MESSAGE:
-      return { ...state, messages: [...state.messages, action.item] };
+      return { ...state, prevMessages: [...state.prevMessages, action.item] };
     case SET_USERNAME:
       return { ...state, username: action.username };
     default:

@@ -11,6 +11,8 @@ const MessagesState = (props) => {
   const MESSAGE_CHANNEL = "MESSAGE_CHANNEL";
   const pubnub = new PubNub(pubnubConfig);
   function PubSub() {
+    pubnub.subscribe({ channels: [MESSAGE_CHANNEL] });
+
     this.addListener = (listenerConfig) => {
       pubnub.addListener(listenerConfig);
     };
@@ -22,6 +24,32 @@ const MessagesState = (props) => {
         message,
         channel: MESSAGE_CHANNEL,
       });
+    };
+    this.addMessageAction = () => {
+      pubnub.addMessageAction({
+        channel: "MESSAGE_CHANNEL",
+        messageTimetoken: "16078247625210876",
+        action: {
+          type: "reaction",
+          value: "Thus us my realeutetetutjte face",
+        },
+
+        function(status, response) {
+          console.log(status, response);
+        },
+      });
+    };
+
+    this.getMessageActions = () => {
+      pubnub.getMessageActions(
+        {
+          channel: "MESSAGE_CHANNEL",
+          limit: 100,
+        },
+        function (status, response) {
+          console.log(status, response);
+        }
+      );
     };
   }
   const pubsub = new PubSub();
@@ -35,10 +63,10 @@ const MessagesState = (props) => {
 
   const [state, dispatch] = useReducer(MessagesReducer, initialState);
 
-  const newMessage = ({ text, username }) => {
+  const newMessage = (obj) => {
     dispatch({
       type: NEW_MESSAGE,
-      item: { id: uuid(), text, username, timestamp: Date.now() },
+      item: obj,
     });
   };
 
@@ -47,12 +75,12 @@ const MessagesState = (props) => {
       .fetchMessages({
         channels: [MESSAGE_CHANNEL],
 
-        count: 55, // default/max is 25
+        count: 75, // default/max is 25
       })
       .then(async (res) => {
         dispatch({
           type: GET_MESSAGES,
-          item: res,
+          item: res.channels.MESSAGE_CHANNEL,
         });
       });
   };

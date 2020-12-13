@@ -3,6 +3,20 @@ import { useEffect, useContext, useState } from "react";
 import MessagesContext from "../src/context/Messages/MessagesContext";
 const Messages = () => {
   const messagesContext = useContext(MessagesContext);
+  const {
+    pubsub: {
+      fetchMessages,
+      publish,
+      addListener,
+      addMessageAction,
+      getMessageActions,
+    },
+    pubsub,
+    newMessage,
+    messages,
+    prevMessages,
+    getMessages,
+  } = messagesContext;
   const [messagesArr, setMessagesArr] = useState("");
 
   const onChange = (e) => {
@@ -16,36 +30,41 @@ const Messages = () => {
         id: "b0290cf0-0cf7-4357-8ba6-2448e445c146",
         text: messagesArr,
         timestamp: 160774360691909,
-        username: "anonymoudts",
+        username: "anonymoudtyyyts",
       },
 
       type: "NEW_MESSAGE",
     });
   };
+  const addReaction = () => {
+    addMessageAction();
+  };
 
-  const {
-    pubsub: { fetchMessages, publish },
-    pubsub,
-    newMessage,
-    prevMessages,
-    getMessages,
-  } = messagesContext;
+  const getMessageReactions = () => {
+    getMessageActions();
+  };
+
   useEffect(() => {
     getMessages();
   }, []);
   console.log(prevMessages);
+  //const {c} = prevMessages
+
   useEffect(() => {
-    pubsub.addListener({
+    addListener({
       message: (messageObject) => {
-        const { channel, message } = messageObject;
+        const { channel, message, timetoken } = messageObject;
+        const obj = {
+          channel,
+          message,
+          timetoken,
+        };
+        console.log("Received message", messageObject, "channel", channel);
 
-        console.log("Received message", message, "channel", channel);
-
-        newMessage(message);
+        newMessage(obj);
       },
     });
   }, []);
-
   return (
     <div>
       <input
@@ -56,19 +75,31 @@ const Messages = () => {
         }}
       />
       <input type='submit' value='submit' onClick={publishMessage} />
-      {/* {messages.map((messageItem) => {
-        const { id, text, username, timestamp } = messageItem;
-
-        return (
-          <div key={id}>
-            <h4>{new Date(timestamp).toLocaleString()}</h4>
-            <p>{text}</p>
-            <h4>- {username}</h4>
-
-            <hr />
-          </div>
-        );
-      })} */}
+      <input
+        type='submit'
+        value='addreact'
+        onClick={() => {
+          addReaction();
+        }}
+      />
+      <input
+        type='submit'
+        value='getreact'
+        onClick={() => {
+          getMessageReactions();
+        }}
+      />
+      {prevMessages !== null ? (
+        prevMessages
+          .filter((message) => {
+            return message.message.item.text;
+          })
+          .map((message) => {
+            return <p>{message.message.item.text}</p>;
+          })
+      ) : (
+        <p>No messages</p>
+      )}
     </div>
   );
 };
