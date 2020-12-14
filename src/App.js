@@ -1,4 +1,4 @@
-import MessagesState from "../src/context/Messages/MessagesState";
+import { MessagesState, pubsub } from "../src/context/Messages/MessagesState";
 import Messages from "./Messages";
 import { useEffect, useContext, useState } from "react";
 
